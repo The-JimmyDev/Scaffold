@@ -1,0 +1,1 @@
+Next.js template using tailwind, JS, ESLINT, and src/ directory. All the default boilerplate, svgs and images stripped out.
