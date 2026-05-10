@@ -1,4 +1,4 @@
-# scaffold
+# Scaffold
 
 A fast, opinionated project scaffolder.
 
@@ -23,7 +23,7 @@ Available templates:
 
 ## Why
 
-For me specifically, every Next.js project starts the same way. Run `create-next-app`, delete half of what it generates, recreate the same folder structure, fix `package.json`, install the same packages. Every time. 20 minutes of my life wasted.
+For me specifically, every Next.js project starts the same way. Run `create-next-app`, delete half of what it generates, recreate the same folder structure, install the same packages. Every time. 20 minutes of my life wasted.
 
 This fixes that. One command, your template, ready to go.
 
@@ -38,13 +38,7 @@ Scaffold/
     └── next-base/
         ├── public/
         ├── src/
-        ├── .env.local
-        ├── .gitignore
-        ├── jsconfig.json
-        ├── next.config.mjs
-        ├── postcss.config.mjs
-        ├── eslint.config.mjs
-        ├── package.json
+        ...
         ├── instructions.py  ← template-specific setup, not copied
         └── scaffold.txt     ← template description, not copied
 ```
