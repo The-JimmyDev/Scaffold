@@ -57,7 +57,7 @@ Scaffold/
 
 ```bash
 # See all options and description
-python scaffoly.py -h
+python scaffold.py -h
 
 # List available templates
 python scaffold.py
