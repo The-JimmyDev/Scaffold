@@ -1,0 +1,11 @@
+{
+  "name": "blank",
+  "description": "A blank template. Add your own content and instructions.",
+  "actions": [
+    "Literally doesn't do anything"
+  ],
+  "dependencies": {
+    "system": [],
+    "python": []
+  }
+}

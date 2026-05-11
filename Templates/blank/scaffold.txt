@@ -1,1 +1,0 @@
-A blank template. Add your own files and configure instructions.py to your needs.

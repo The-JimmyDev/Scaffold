@@ -1,0 +1,13 @@
+{
+  "name": "next-base",
+  "description": "Next.js template using Tailwind, JS, ESLint, and src/ directory with all bloat removed",
+  "actions": [
+    "Modify package.json with project name",
+    "Run npm install",
+    "Run npm update (prompted)"
+  ],
+  "dependencies": {
+    "system": ["node", "npm"],
+    "python": []
+  }
+}

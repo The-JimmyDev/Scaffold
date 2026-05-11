@@ -25,6 +25,7 @@ if not yes:
     rich.print("[gold1]Run npm update? (y/N) > [/gold1]", end="")
 
 if yes or input("").lower() == "y":
+    rich.print("> [light_sky_blue1]Running npm install[/light_sky_blue1]")
     subprocess.run(["npm", "update"], cwd=project_path, shell=True)
     rich.print("[grey50]-------[/grey50] [green1]Update successful[/green1] [grey50]-------[/grey50]")
 
