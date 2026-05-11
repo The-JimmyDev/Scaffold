@@ -17,11 +17,17 @@ def main():
         rich.print("> [light_sky_blue1]No template selected. Use the -t or --template flag to select.[/light_sky_blue1]")
         rich.print("Available templates:")
         for templ in os.scandir(template_dir):
-            with open(f"{templ.path}/scaffold.txt") as f:
-                rich.print(f"    - [gold1]{templ.name}[/gold1] : {f.read()}")
+            if templ.is_dir and os.path.exists(f"{templ.path}/scaffold.txt"):
+                with open(f"{templ.path}/scaffold.txt") as f:
+                    rich.print(f"    - [gold1]{templ.name}[/gold1] : {f.read()}")
         sys.exit(0)
     
     template_path = os.path.join(template_dir, args.template)
+    
+    
+    if not os.path.isdir(template_path):
+        rich.print(f"[red]Template '{args.template}' not found.[/red]")
+        sys.exit(1)
     
     if args.name:
         project_name = args.name
@@ -29,18 +35,46 @@ def main():
         rich.print("[gold1]Project name > [/gold1]", end="")
         project_name: str = input("")
         
-    sou  = template_path #source
-    des = f"./{project_name}-scaffold" if os.path.isdir(f"./{project_name}") else f"./{project_name}" #destination
+    sou  = template_path #SOUrce
+    des = f"./{project_name}-scaffold" if os.path.isdir(f"./{project_name}") else f"./{project_name}" #DEStination
     
-    shutil.copytree(src=sou, dst=des, ignore=shutil.ignore_patterns("instructions.py", "scaffold.txt"))
+
+    if not os.path.exists(f"{template_path}/instructions.py"):
+        rich.print(f"[red]Template is missing instructions.py.[/red]")
+        sys.exit(1)
+    
+    try:
+        shutil.copytree(src=sou, dst=des, ignore=shutil.ignore_patterns("instructions.py", "scaffold.txt"))
+    except Exception as e:
+        abort(msg=f"Something went wrong: {e}", des=des)
     
     rich.print(f'[grey50]-------[/grey50] [green1]"{project_name}" Created successfully[/green1] [grey50]-------[/grey50]')
-    rich.print("> [light_sky_blue1]Running provided instructions now[/light_sky_blue1]")
-    runpy.run_path(f"{template_path}/instructions.py", init_globals={
-        "project_path": des,
-        "project_name": project_name,
-        "yes": args.yes
-    })
+    rich.print("> [red]WARNING: instructions.py will now execute. Only proceed if you trust this template.[/red]")
+    if not args.yes:
+        rich.print("[gold1]Continue? (y/N) > [/gold1]", end="")
+    if args.yes or input("").lower() == "y":
+
+        try:
+            runpy.run_path(f"{template_path}/instructions.py", init_globals={
+                "project_path": des,
+                "project_name": project_name,
+                "yes": args.yes
+            })
+        except Exception as e:
+            abort(msg=f"Something went wrong: {e}", des=des)
+    else:
+        rich.print("> [light_sky_blue1]Instructions not executed. Copying complete.[/light_sky_blue1]")
+        sys.exit(0)
+
+
+def abort(msg, des):
+    rich.print(f"[red]{msg}[/red]")
+    if os.path.isdir(des):
+        rich.print("[red]Reverting changes[/red]")
+        shutil.rmtree(des)
+    sys.exit(1)
     
+
+
 if __name__ == '__main__':
     main()
