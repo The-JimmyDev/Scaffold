@@ -12,12 +12,13 @@ import importlib.util
 def main():
     parser = argparse.ArgumentParser(description="Simple scalable scaffolder that creates and executes setups of predefined templates from its Templates/ directory.")
     parser.add_argument("name", nargs="?", help="Project name. Prompted if not provided.")
-    parser.add_argument("-t", "--template", help="Template to use. Run with -t alone to list available templates.")
+    parser.add_argument("-t", "--template", help="Selects template to use.")
     parser.add_argument("-y", "--yes", action="store_true", help="Skip all prompts and confirm everything automatically.")
+    parser.add_argument("-l", "--list", action="store_true", help="Lists available templates.")
     args = parser.parse_args()
     template_dir = f"{os.path.dirname(os.path.abspath(__file__))}/Templates/"
     
-    if args.template is None:
+    if args.list or args.template is None:
         list_templates(template_dir=template_dir)
         sys.exit(0)
     

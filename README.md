@@ -63,6 +63,8 @@ python scaffold.py -h
 
 # List available templates
 python scaffold.py
+# OR
+python scaffold.py -l
 
 # Scaffold a project
 python scaffold.py -t <template> <name>
@@ -76,7 +78,8 @@ python scaffold.py -t <template> <name> -y
 | Flag | Description |
 |------|-------------|
 | `name` | Project name. Prompted if not provided. |
-| `-t`, `--template` | Template to use. Omit to list available templates. |
+| `-l`, `--list` | Lists templates. |
+| `-t`, `--template` | Template to use. |
 | `-y`, `--yes` | Skip all prompts and confirm everything automatically. |
 
 ---
