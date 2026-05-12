@@ -11,27 +11,21 @@ Available templates:
     ...
 
 > python scaffold.py -t next-base my-project
-> This template will:
+This template will:
     - Modify package name in package.json
     - Run npm install
     - Run npm update (prompted)
-> WARNING: instructions.py will now execute. Only proceed if you trust this template.
-Continue? (y/N) > y
+> Docker is available
+> Running instructions safely.
+> Spinning up sandbox environment (nikolaik/python-nodejs:latest)...
 ------- "my-project" Created successfully -------
-> Modifying package name in package.json
-------- Modification successful -------
-> Running npm install
-------- Installation successful -------
-Run npm update? (y/N) > y
-> Running npm install
-------- Update successful -------
 ```
 
 ---
 
 ## Why
 
-For me specifically, every Next.js project starts the same way. Run `create-next-app`, delete half of what it generates, recreate the same folder structure, install the same packages. Every time. 20 minutes of my life wasted.
+Every Next.js project starts the same way. Run `create-next-app`, delete half of what it generates, recreate the same folder structure, install the same packages. Every time.
 
 This fixes that. One command, your templates, ready to go.
 
@@ -41,14 +35,14 @@ This fixes that. One command, your templates, ready to go.
 
 ```
 Scaffold/
-├── scaffold.py          ← the script
+├── scaffold.py
 └── Templates/
     └── next-base/
         ├── public/
         ├── src/
         ...
-        ├── instructions.py  ← template-specific setup, not copied (optional)
-        └── scaffold.json    ← template manifest, not copied
+        ├── instructions.py   ← template-specific setup, never copied (optional)
+        └── scaffold.json     ← template manifest, never copied
 ```
 
 `instructions.py` and `scaffold.json` are internal to each template and are never copied into your project.
@@ -58,9 +52,6 @@ Scaffold/
 ## Usage
 
 ```bash
-# See all options and description
-python scaffold.py -h
-
 # List available templates
 python scaffold.py
 # OR
@@ -71,6 +62,9 @@ python scaffold.py -t <template> <name>
 
 # Skip all prompts, confirm everything automatically
 python scaffold.py -t <template> <name> -y
+
+# Run instructions unsafely (no Docker sandbox)
+python scaffold.py -t <template> <name> -us
 ```
 
 ### Flags
@@ -78,22 +72,27 @@ python scaffold.py -t <template> <name> -y
 | Flag | Description |
 |------|-------------|
 | `name` | Project name. Prompted if not provided. |
-| `-l`, `--list` | Lists templates. |
+| `-l`, `--list` | List available templates. |
 | `-t`, `--template` | Template to use. |
-| `-y`, `--yes` | Skip all prompts and confirm everything automatically. |
+| `-y`, `--yes` | Skip all prompts and confirm everything safe automatically.|
+| `-us`, `--unsafe` | Run `instructions.py` outside of Docker. Only use with templates you trust! |
+
+---
+
+## Safety
+
+When Docker is available, `instructions.py` runs inside a container — your system stays untouched. When Docker isn't found, Scaffold warns you and asks you to explicitly type `proceed` before running anything. The `--unsafe` flag skips that prompt; only use it with templates you wrote or trust.
 
 ---
 
 ## Adding a Template
 
 1. Create a folder under `Templates/` with your template name.
-2. Add a `scaffold.json` manifest (see below).
-3. Optionally add an `instructions.py` for setup logic.
-4. Put your actual template files in there.
+2. Add a `scaffold.json` manifest (required).
+3. Optionally add an `instructions.py` for post-copy setup logic.
+4. Put your actual template files in the folder.
 
 ### scaffold.json
-
-Every template requires a `scaffold.json` manifest:
 
 ```json
 {
@@ -103,6 +102,9 @@ Every template requires a `scaffold.json` manifest:
     "Modifies package.json",
     "Runs npm install"
   ],
+  "docker": {
+    "image": "nikolaik/python-nodejs:latest"
+  },
   "dependencies": {
     "system": ["node", "npm"],
     "python": []
@@ -114,23 +116,24 @@ Every template requires a `scaffold.json` manifest:
 |-------|----------|-------------|
 | `name` | Yes | Display name shown when listing templates. |
 | `description` | Yes | One-line description shown when listing templates. |
-| `actions` | No | List of things `instructions.py` will do, shown to the user before execution. |
+| `actions` | No | What `instructions.py` will do, shown to the user before execution. |
+| `docker.image` | No | Docker image to use for safe execution. Defaults to `python:3-slim`. |
 | `dependencies.system` | No | System binaries required (checked via `which`). |
 | `dependencies.python` | No | Python packages required (checked via import name, e.g. `PIL` not `pillow`). |
 
-Scaffold checks all dependencies before copying anything. If something is missing it exits early and tells you what's needed.
+Dependencies are checked before anything is copied. If something is missing, Scaffold exits early and tells you what's needed.
 
 ### instructions.py
 
-Optional. If present, runs after the template is copied. Receives these variables automatically:
+Optional. Runs after the template is copied. Receives these globals automatically:
 
 ```python
-project_name  # the name entered by the user
-project_path  # path to the newly created project
-yes           # bool, True if -y flag was passed
+project_name  # str  — the name entered by the user
+project_path  # str  — path to the newly created project directory
+yes           # bool — True if -y flag was passed
 ```
 
-The user is warned and prompted before `instructions.py` executes. `-y` skips the prompt.
+When running safely via Docker, `project_path` maps to `/workspace` inside the container and `instructions.py` is mounted at `/scripts/instructions.py`. Any files you write to `project_path` will appear in the real output directory on the host.
 
 ---
 
@@ -138,6 +141,7 @@ The user is warned and prompted before `instructions.py` executes. `-y` skips th
 
 - Python 3.x
 - [`rich`](https://github.com/Textualize/rich) — `pip install rich`
+- Docker (optional, but recommended — enables safe sandboxed execution)
 
 Everything else is standard library.
 
@@ -145,6 +149,6 @@ Everything else is standard library.
 
 ## Notes
 
-- Running from a different directory is preferred — the script always resolves template paths relative to itself.
-- If a folder with the project name already exists, the project is scaffolded as `<name>-YYYYMD-HMS` instead.
+- Run Scaffold from any directory — template paths are always resolved relative to `scaffold.py` itself.
+- If a folder with the chosen name already exists, the project is created as `<name>-YYYYMMDD-HHMMSS` instead.
 - Works on Windows and Linux.

@@ -6,8 +6,11 @@
     "Run npm install",
     "Run npm update (prompted)"
   ],
+  "docker": {
+    "image": "nikolaik/python-nodejs:latest"
+  },
   "dependencies": {
     "system": ["node", "npm"],
-    "python": []
+    "python": ["rich"]
   }
 }

@@ -7,7 +7,7 @@
 #   yes           (bool) — True if the user passed the -y flag
 #
 # Use subprocess.run() to run shell commands, os / shutil for file operations,
-# and print() from rich for colored output.
+# and print() from rich for colored output (you must add it to dependencies).
 #
 # This blank template does nothing by default.
 # Add your own setup steps below.
